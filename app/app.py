@@ -6,10 +6,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 import numpy as np
 import geobr
-import geopandas as gpd
-import json
-import math
-import streamlit.components.v1 as components
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -193,32 +189,6 @@ def card_distribuicao(titulo, distribuicao, total):
             """,
             unsafe_allow_html=True
         )
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
