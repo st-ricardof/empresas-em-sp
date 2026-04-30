@@ -7,4 +7,4 @@ requests==2.31.0
 openpyxl==3.1.2
 geopandas>=0.14.0
 geobr
-lxml==4.9.3
+lxml>=5.0.0
