@@ -3,7 +3,7 @@
 **A quantidade de empresas explica o desenvolvimento de um município?**  
 Análise com dados dos 645 municípios paulistas sugere que não — e aponta o que importa mais.
 
-> 🔗 Dashboard interativo: **[link após deploy]**
+> 🔗 Dashboard interativo: **https://empresas-vs-ipdm-sp.streamlit.app/**
 
 ---
 

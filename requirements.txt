@@ -1,10 +1,10 @@
 pandas
 numpy
-duckdb==0.10.0
-plotly==5.18.0
-streamlit==1.31.0
-requests==2.31.0
-openpyxl==3.1.2
+duckdb>=1.0.0
+plotly>=5.18.0
+streamlit>=1.40.0
+requests>=2.31.0
+openpyxl>=3.1.2
 geopandas>=0.14.0
 geobr
- 
+pillow>=11.0.0

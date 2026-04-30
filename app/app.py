@@ -91,7 +91,8 @@ for col in colunas_numericas:
 # =========================
 
 st.title("📊 Estrutura Empresarial e Desenvolvimento Municipal de São Paulo")
-st.caption("← Abra o menu lateral para entender o dashboard, as fontes e como navegar.")
+st.info("💡 Abra o **menu lateral** (←) para entender o contexto, as fontes e como navegar pelo dashboard.")
+
 
 
 # =========================
