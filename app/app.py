@@ -826,3 +826,51 @@ with st.sidebar:
     [![LinkedIn](https://img.shields.io/badge/LinkedIn-st--ricardof-0A66C2?logo=linkedin)](https://www.linkedin.com/in/st-ricardof/)
     [![Email](https://img.shields.io/badge/Email-st.ricardof@gmail.com-D14836?logo=gmail)](mailto:st.ricardof@gmail.com)
     """)
+
+import google.generativeai as genai
+
+st.divider()
+st.header("🔍 Perfil detalhado por município")
+st.caption("Selecione um município para gerar uma interpretação, realizada por IA generativa, dos dados em conjunto.")
+
+municipios_lista = sorted(df["municipio"].dropna().unique())
+municipio_selecionado = st.selectbox("Escolha um município", municipios_lista)
+
+if municipio_selecionado:
+    row = df[df["municipio"] == municipio_selecionado].iloc[0]
+
+    classificacao = classificar_ipdm(row["ipdm_total"])
+
+    media_ipdm  = df["ipdm_total"].mean()
+    media_mei   = df["pct_mei"].mean()
+    media_micro = df["pct_micro"].mean()
+
+    prompt = fprompt = f"""Você é um especialista em desenvolvimento municipal e política pública do estado de São Paulo.
+
+        Dados do município de {municipio_selecionado}:
+        - IPDM total: {row['ipdm_total']:.3f} (classificação: {classificacao}) | Média SP: {media_ipdm:.3f}
+        - Riqueza: {row['riqueza']:.3f} | Escolaridade: {row['escolaridade']:.3f} | Longevidade: {row['longevidade']:.3f}
+        - Total de empresas: {int(row['total_empresas']):,} | Densidade: {row['empresas_por_1000_hab']:.1f} por 1.000 hab.
+        - % MEI: {row['pct_mei']:.1f}% | Média SP: {media_mei:.1f}%
+        - % Microempresas: {row['pct_micro']:.1f}% | % Pequenas: {row['pct_pequena']:.1f}% | % Médias/Grandes: {row['pct_demais']:.1f}%
+        - População: {int(row['populacao']):,}
+
+        Leia todos os dados acima e escreva UM parágrafo denso e direto, como se fosse um briefing para um gestor público.
+
+        Seu parágrafo deve:
+        - Identificar o padrão mais relevante que os dados revelam sobre este município
+        - Relacionar os indicadores entre si (ex: por que o IPDM é alto/baixo dado o perfil empresarial?)
+        - Sugerir uma hipótese socioeconômica ou histórica que explique o perfil observado
+        - Usar linguagem de análise, não de descrição
+
+        Não liste dados. Não repita os números sem contexto. Escreva em português, tom técnico mas acessível."""
+
+    if st.button("Gerar análise", type="primary"):
+        with st.spinner("Analisando dados do município..."):
+            try:
+                genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+                model = genai.GenerativeModel("gemini-2.5-flash")
+                response = model.generate_content(prompt)
+                st.markdown(response.text)
+            except Exception as e:
+                st.error(f"Erro ao gerar análise: {e}")
