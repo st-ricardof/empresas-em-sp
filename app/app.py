@@ -768,10 +768,33 @@ with st.sidebar:
     - **Cards no topo:** visão geral do estado de SP
     - **Mapa:** explore a distribuição geográfica de qualquer variável
     - **Gráfico de dispersão:** investigue a relação entre duas variáveis
+    - **Perfil detalhado por município:** gere uma interpretação analítica com apoio de IA
     - **Passe o mouse** sobre qualquer município no mapa para ver todos os indicadores
+
     """)
 
     st.divider()
+
+    st.markdown("### 🤖 Análise com IA generativa")
+    st.markdown("""
+    A seção **Perfil detalhado por município** usa IA generativa para produzir uma
+    leitura analítica individual de cada município.
+
+    A interpretação é feita a partir dos indicadores disponíveis no dashboard, como:
+    - IPDM total e seus componentes
+    - estrutura empresarial por porte
+    - proporção de MEIs
+    - densidade empresarial
+    - população
+
+    O objetivo é ajudar o usuário a transformar os dados em uma leitura mais contextual,
+    conectando desenvolvimento municipal e perfil econômico local.
+    """)
+
+    st.info(
+        "A análise gerada por IA deve ser usada como apoio exploratório. "
+        "Ela não substitui validação técnica, análise causal ou conhecimento local sobre o município."
+    )
 
     st.markdown("### 📈 O que é o IPDM?")
     st.markdown("""
@@ -811,7 +834,8 @@ with st.sidebar:
     não relações de causa e efeito
     - Os dados representam um **recorte temporal** específico e podem não refletir
     mudanças recentes
-    - Algumas variáveis do IPDM utilizam **estimativas e projeções** sujeitas a revisão
+    - A análise por município usa **IA generativa** e deve ser interpretada como apoio exploratório,
+    não como conclusão definitiva.
     """)
 
     st.divider()
@@ -831,7 +855,11 @@ import google.generativeai as genai
 
 st.divider()
 st.header("🔍 Perfil detalhado por município")
-st.caption("Selecione um município para gerar uma interpretação, realizada por IA generativa, dos dados em conjunto.")
+st.caption(
+"Selecione um município para gerar uma interpretação analítica dos dados. "
+"A análise é gerada automaticamente por IA com base nos indicadores do município."
+)
+st.caption("⚠️ A análise é gerada automaticamente e deve ser interpretada como apoio exploratório.")
 
 municipios_lista = sorted(df["municipio"].dropna().unique())
 municipio_selecionado = st.selectbox("Escolha um município", municipios_lista)
@@ -845,7 +873,29 @@ if municipio_selecionado:
     media_mei   = df["pct_mei"].mean()
     media_micro = df["pct_micro"].mean()
 
-    prompt = fprompt = f"""Você é um especialista em desenvolvimento municipal e política pública do estado de São Paulo.
+    prompt = f"""
+        Você é um analista de dados especializado em desenvolvimento municipal.
+
+        Escreva uma análise curta e estruturada no seguinte formato:
+
+        Insight: (1 frase com o principal ponto)
+        Leitura: (2–3 frases conectando os dados)
+        Implicação: (1 frase final com interpretação)
+
+        Regras:
+        - Seja específico e direto
+        - Conecte variáveis (não descreva isoladamente)
+        - Evite frases genéricas
+
+        Exemplo de resposta esperada:
+
+        Insight: Campinas apresenta alto desenvolvimento sustentado por menor dependência de MEIs.
+        Leitura: A menor proporção de MEIs e maior presença de empresas médias e grandes indicam uma estrutura econômica mais consolidada. Isso se reflete em maior capacidade de geração de renda e empregos formais.
+        Implicação: O município possui um ecossistema produtivo mais maduro e menos dependente do empreendedorismo individual.
+
+        Agora gere a análise para o município abaixo seguindo exatamente esse formato:
+
+
 
         Dados do município de {municipio_selecionado}:
         - IPDM total: {row['ipdm_total']:.3f} (classificação: {classificacao}) | Média SP: {media_ipdm:.3f}
@@ -855,22 +905,36 @@ if municipio_selecionado:
         - % Microempresas: {row['pct_micro']:.1f}% | % Pequenas: {row['pct_pequena']:.1f}% | % Médias/Grandes: {row['pct_demais']:.1f}%
         - População: {int(row['populacao']):,}
 
-        Leia todos os dados acima e escreva UM parágrafo denso e direto, como se fosse um briefing para um gestor público.
-
-        Seu parágrafo deve:
-        - Identificar o padrão mais relevante que os dados revelam sobre este município
-        - Relacionar os indicadores entre si (ex: por que o IPDM é alto/baixo dado o perfil empresarial?)
-        - Sugerir uma hipótese socioeconômica ou histórica que explique o perfil observado
-        - Usar linguagem de análise, não de descrição
-
-        Não liste dados. Não repita os números sem contexto. Escreva em português, tom técnico mas acessível."""
+       """
 
     if st.button("Gerar análise", type="primary"):
-        with st.spinner("Analisando dados do município..."):
+        with st.spinner("Analisando dados do município... Por favor, aguarde, pode levar alguns segundos."):
             try:
                 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
                 model = genai.GenerativeModel("gemini-2.5-flash")
                 response = model.generate_content(prompt)
-                st.markdown(response.text)
+                
+                texto = response.text.strip()
+
+                texto = response.text
+
+                linhas = texto.split("\n")
+
+                insight = ""
+                leitura = ""
+                implicacao = ""
+
+                for linha in linhas:
+                    if linha.startswith("Insight:"):
+                        insight = linha.replace("Insight:", "").strip()
+                    elif linha.startswith("Leitura:"):
+                        leitura = linha.replace("Leitura:", "").strip()
+                    elif linha.startswith("Implicação:"):
+                        implicacao = linha.replace("Implicação:", "").strip()
+
+                st.markdown(f"**💡 Insight:** {insight}")
+                st.write(leitura)
+                st.caption(f"👉 {implicacao}")
+                
             except Exception as e:
                 st.error(f"Erro ao gerar análise: {e}")

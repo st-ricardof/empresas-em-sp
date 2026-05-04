@@ -1,87 +1,103 @@
-# 📊 Estrutura Empresarial e Desenvolvimento Municipal de São Paulo
+# Estrutura Empresarial e Desenvolvimento Municipal de São Paulo
 
-**A quantidade de empresas explica o desenvolvimento de um município?**  
-Análise com dados dos 645 municípios paulistas sugere que não — e aponta o que importa mais.
-
-> 🔗 Dashboard interativo: **https://empresas-vs-ipdm-sp.streamlit.app/**
+**Dashboard interativo:** https://empresas-vs-ipdm-sp.streamlit.app/  
+**Repositório:** https://github.com/st-ricardof/empresas-em-sp
 
 ---
 
-##  Resumo 
+## O projeto em 30 segundos
 
-Este projeto investiga a relação entre estrutura empresarial e desenvolvimento socioeconômico (IPDM) nos municípios de São Paulo.
+Investiguei se municípios com mais empresas são mais desenvolvidos — hipótese intuitiva, mas que os dados contradizem.
 
-**Principais insights:**
-- O **volume total de empresas não explica desenvolvimento** (correlação: **0,03**)
-- Municípios com maior proporção de **MEIs tendem a ter menor IPDM** (correlação: **-0,38**)
-- **Escolaridade** apresenta relação muito mais forte com desenvolvimento (correlação: **0,76**)
+Cruzei três bases públicas (de porte de empresas, índice paulista de desenvolvimento municipal e população) cobrindo os **645 municípios do estado de São Paulo** (44,4 milhões de habitantes, 7,7 milhões de empresas) e construí um dashboard interativo com camada de interpretação por IA generativa.
 
- **Conclusão:** o nível de desenvolvimento está mais associado à **estrutura econômica e fatores sociais** do que à quantidade de empresas.
+**Resultado central**: o nível de desenvolvimento está mais associado à **estrutura econômica e a fatores sociais** do que à quantidade de empresas. O volume total de empresas praticamente não explica o desenvolvimento (correlação: 0,03), enquanto **municípios com maior proporção de MEIs tendem a apresentar menor IPDM (correlação: -0,38)**.
 
 ---
 
-##  Por que isso importa
+## Resultados analíticos
 
-Os dados sugerem que políticas focadas apenas na abertura de empresas podem ter impacto limitado no desenvolvimento local.
-
-- Incentivar **crescimento além do MEI** pode ser mais relevante do que aumentar volume de negócios  
-- A **qualidade da estrutura produtiva** importa mais do que sua quantidade  
-- **Educação** aparece como fator central no desenvolvimento municipal  
-
----
-
-##  Principais achados
-
-| Relação | Correlação | Interpretação |
+| Relação analisada | Correlação | O que isso significa |
 |---|---|---|
-| % MEI × IPDM | **-0,38** | Maior presença de MEIs associada a menor desenvolvimento |
-| % Pequenas empresas × Riqueza | **+0,36** | Pequenas empresas têm associação mais positiva que MEIs |
-| Escolaridade × IPDM | **+0,76** | Fator mais fortemente associado ao desenvolvimento |
-| Total de empresas × IPDM | **+0,03** | Volume praticamente irrelevante |
-| % Microempresas × % Demais | **-0,93** | Estrutura empresarial é altamente concentrada |
+| Total de empresas × IPDM | **+0,03** | Volume de empresas praticamente irrelevante |
+| % MEI × IPDM | **-0,38** | Maior concentração de MEIs associada a menor desenvolvimento |
+| % Pequenas × Riqueza municipal | **+0,36** | Pequenas empresas têm associação mais positiva que MEIs |
+| Escolaridade × IPDM | **+0,76** | Fator com maior associação ao desenvolvimento municipal |
+| % Microempresas × % Demais portes | **-0,93** | Estrutura altamente concentrada em micro |
 
-Além disso:
-- **91,2% das empresas são microempresas**
-- **12,5% operam como MEI**
+Adicionalmente: 91,2% das empresas no estado são microempresas; 12,5% operam no regime MEI.
 
----
-
-##  Abordagem analítica
-
-- Análise exploratória (EDA)
-- Cálculo de correlações entre variáveis
-- Comparação entre estrutura empresarial e indicadores de desenvolvimento
-- Análise territorial (mapa + distribuição espacial)
+> **Interpretação:** o achado não invalida política de fomento empresarial — mas sugere que *qualidade da estrutura produtiva* e *capital humano* têm peso maior do que volume de negócios no desenvolvimento local.
 
 ---
 
-##  O dashboard
+## Screenshots
 
-O dashboard foi desenvolvido para permitir exploração intuitiva dos dados em três níveis:
+![Visão geral do dashboard](docs/screenshots/overview.png)
+*Big numbers descritivos e proporções das principais méticas estaduais: 645 municípios, 7,7 mi de empresas e distribuição por porte*
 
-**Visão geral**  
-Panorama do estado com indicadores principais (população, empresas, estrutura e IPDM)
+![Mapa de classificação IPDM](docs/screenshots/map.png)
+*Distribuição territorial do IPDM — municípios com IPDM muito alto concentrados na macrometrópole*
 
-**Distribuição territorial**  
-Mapa interativo dos municípios com múltiplas camadas de análise
+![Scatter % MEI vs IPDM](docs/screenshots/scatter.png)
+*Correlação de -0,38 entre proporção de MEIs e desenvolvimento municipal*
 
-**Relação entre variáveis**  
-Scatter plot dinâmico com seleção de eixos e linha de tendência
+![Análise por IA](docs/screenshots/perfil_ia.png)
+*Interpretação gerada automaticamente por município com Gemini 2.5 Flash*
 
-Um diferencial do projeto foi a criação de um **dicionário interpretativo** com mais de 50 combinações de variáveis, traduzindo correlações em linguagem acessível.
+
+## O que foi construído
+
+### Pipeline de dados
+- Ingestão de 3 fontes heterogêneas (SEADE Empresas 2026, SEADE IPDM 2025, IBGE Censo 2022)
+- Processamento e integração em banco DuckDB com camada de views analíticas
+- Tratamento de inconsistências entre bases com anos distintos e diferentes granularidades
+
+### Dashboard (Streamlit)
+O dashboard foi estruturado em três camadas analíticas:
+
+**Visão geral estadual** — KPIs sobre população, empresas e IPDM médio, com distribuição por porte e classificação de desenvolvimento
+
+**Distribuição territorial** — mapa interativo dos 645 municípios com múltiplas camadas de variáveis; tooltip com todos os indicadores ao hover
+
+**Relação entre variáveis** — scatter plot dinâmico com seleção de eixos e linha de tendência, acompanhado de interpretação contextual automática
+
+### Dicionário interpretativo
+Criei um sistema com mais de **50 combinações de variáveis pré-mapeadas**, que traduz automaticamente a correlação exibida no scatter em linguagem analítica acessível. Cada combinação retorna uma leitura específica sobre o que aquela relação pode indicar economicamente — não apenas o valor numérico.
+
+### Camada de IA generativa (Gemini 2.5 Flash)
+Para cada município, o sistema gera uma interpretação analítica estruturada em três dimensões:
+- **Insight principal** — síntese do perfil do município em uma frase
+- **Leitura analítica** — conexão entre IPDM, estrutura empresarial, densidade e composição por porte, comparando com a média estadual
+- **Implicação econômica** — interpretação orientada a contexto local
+
+O prompt foi engenheirado para forçar especificidade: inclui benchmarks estaduais em tempo real, proíbe descrições isoladas de variáveis e exige que a resposta conecte pelo menos dois indicadores. O output é parseado programaticamente e renderizado em três blocos distintos.
 
 ---
 
-## 📸 Prints
+## Decisões analíticas relevantes
 
-> 📌 Adicionar após deploy:
-- visão geral
-- mapa
-- scatter (% MEI vs IPDM)
+**Por que IPDM e não PIB?** O PIB municipal mais recente disponível era de 2020 — defasagem de 6 anos em relação aos dados de empresas. O IPDM (2025) é mais atual, multidimensional e cobre as mesmas dimensões relevantes para esta análise.
+
+**Por que DuckDB?** Para análises locais em dados tabulares de médio volume, DuckDB oferece desempenho superior ao Pandas puro com sintaxe SQL familiar. A camada de views permite separar a lógica analítica da camada de apresentação.
+
+**O resultado contraintuitivo como achado legítimo.** A hipótese inicial (mais empresas → mais desenvolvimento) foi refutada pelos dados. A análise reconhece esse limite explicitamente em vez de forçar uma narrativa — o que também é informação relevante para gestores públicos e formuladores de política.
 
 ---
 
-##  Stack tecnológica
+## Implicações práticas
+
+Para gestores e analistas de política pública, os dados sugerem que:
+
+- Programas de fomento focados apenas em abertura de empresas podem ter impacto limitado no IPDM
+- Incentivar a transição de MEIs para pequenas empresas pode ser mais eficaz do que aumentar volume bruto
+- Educação emerge como variável-chave — com correlação 20x maior do que o número de empresas
+
+> Esta análise é descritiva e exploratória. Correlação não implica causalidade. Os achados devem ser complementados com análise local e conhecimento territorial.
+
+---
+
+## Stack tecnológica
 
 | Camada | Tecnologia |
 |---|---|
@@ -89,37 +105,14 @@ Um diferencial do projeto foi a criação de um **dicionário interpretativo** c
 | Banco de dados | DuckDB |
 | Análise | Pandas, NumPy |
 | Visualização | Plotly, GeoPandas |
-| Geografia | geobr |
+| Dados geográficos | geobr |
 | Dashboard | Streamlit |
-| Notebooks | Jupyter |
+| IA generativa | Google Gemini 2.5 Flash |
+| Exploração | Jupyter Notebooks |
 
 ---
 
-## 📁 Estrutura do projeto
-
-```
-empresas-em-sp/
-│
-├── README.md
-├── requirements.txt
-│
-├── data/
-│   ├── raw/
-│   └── processed/
-│
-├── notebooks/
-│   ├── 01_exploracao.ipynb
-│   └── 02_geografia.ipynb
-│
-├── app/
-│   └── app.py
-│
-└── outputs/
-```
-
----
-
-## 🔄 Como reproduzir localmente
+## Como rodar localmente
 
 ```bash
 git clone https://github.com/st-ricardof/empresas-em-sp
@@ -129,93 +122,41 @@ python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
-# baixar dados em data/raw/
-
 streamlit run app/app.py
+```
+
+Os dados processados estão disponíveis em `data/processed/`. Para reproduzir o pipeline completo a partir das fontes brutas, consulte os notebooks em `/notebooks`.
+
+Para usar a funcionalidade de análise por IA, configure sua chave de API no arquivo `.streamlit/secrets.toml`:
+```toml
+GEMINI_API_KEY = "sua-chave-aqui"
 ```
 
 ---
 
-## ⚠️ Limitações
+## Limitações
 
-- Correlação não implica causalidade  
-- Bases com anos distintos (2022–2026)  
-- Ausência de variáveis estruturais adicionais (ex: renda detalhada, infraestrutura)  
-- Análise descritiva (não preditiva)
-
----
-
-# Bastidores do projeto 
-
-## Como surgiu o problema
-
-A motivação inicial foi explorar dados abertos do estado de São Paulo, pouco utilizados em portfólios.
-
-A pergunta central emergiu a partir do **Painel de Empresas da SEADE**:
-
-> Municípios com mais empresas são necessariamente mais desenvolvidos?
-
-Inicialmente, considerei o PIB municipal como indicador de desenvolvimento. No entanto, a defasagem temporal (2020 vs 2026) comprometeria a análise.
-
-A solução foi utilizar o **IPDM**, indicador mais recente e multidimensional.
+- Correlação não implica causalidade — os padrões observados indicam associações, não relações causais
+- Bases com anos distintos (2022–2026) — a comparação entre períodos diferentes introduz ruído na análise
+- Ausência de variáveis estruturais importantes como renda domiciliar detalhada e infraestrutura
+- A interpretação gerada por IA é apoio exploratório, não substitui análise técnica aprofundada ou conhecimento local
 
 ---
 
-## A hipótese — e o que os dados mostraram
-
-Hipótese inicial:
-
-> Mais empresas → mais desenvolvimento
-
-Resultado:
-
-- O volume de empresas praticamente **não tem relação com desenvolvimento**
-- A estrutura empresarial também não mostrou efeitos fortes isoladamente
-- A relação mais consistente encontrada foi entre **alta proporção de MEIs e menor IPDM**
-
----
-
-## Interpretação dos resultados
-
-O projeto não encontrou um “driver único” de desenvolvimento.
-
-Pelo contrário, os dados indicam que:
-- desenvolvimento é multifatorial  
-- variáveis sociais (como educação) têm maior peso  
-- estrutura produtiva importa mais do que volume  
-
-Em vez de confirmar a hipótese inicial, a análise mostrou seus limites — o que também é um resultado relevante.
-
----
-
-## Reflexões finais
-
-Este projeto é intencionalmente **descritivo**.
-
-Ele não busca prever ou explicar causalmente, mas sim:
-- identificar padrões
-- levantar hipóteses
-- apoiar discussões mais informadas
-
-> Em alguns casos, a principal descoberta é justamente a ausência de uma relação forte — e isso também orienta melhores decisões.
-
----
-
-##  Dados utilizados
+## Fontes
 
 | Dataset | Fonte | Ano |
 |---|---|---|
 | Painel de Empresas SP | SEADE | 2026 |
-| IPDM | SEADE | 2025 |
+| Índice Paulista de Desenvolvimento Municipal (IPDM) | SEADE | 2025 |
 | Censo Demográfico | IBGE | 2022 |
 
 ---
 
-## 👤 Autor
+## Autor
 
-**Ricardo Fernando dos Santos**  
-São Paulo, Brasil
+**Ricardo Fernando dos Santos** — São Paulo, Brasil
 
-- GitHub: https://github.com/st-ricardof  
-- LinkedIn: https://www.linkedin.com/in/st-ricardof/  
-- Email: st.ricardof@gmail.com
+[![GitHub](https://img.shields.io/badge/GitHub-st--ricardof-181717?logo=github)](https://github.com/st-ricardof)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-st--ricardof-0A66C2?logo=linkedin)](https://www.linkedin.com/in/st-ricardof/)
+[![Email](https://img.shields.io/badge/Email-st.ricardof%40gmail.com-D14836?logo=gmail)](mailto:st.ricardof@gmail.com)
